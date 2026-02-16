@@ -1,1 +1,0 @@
-http_requests_total{job="api",status="200",method=~"GET|POST",handler!~"health.*"}
