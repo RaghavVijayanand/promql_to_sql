@@ -1,0 +1,1 @@
+label_replace(histogram_quantile(0.95, sum by (le, path, method) (rate(http_request_duration_seconds_bucket{job=~"core-.*", status!~"5.."}[5m] offset 1h))) / on (path) group_left (version) max_over_time(sum without (pod) (rate(http_requests_total{env="prod"}[1h]) * 100)[30m:1m]), "service", "$1", "job", "(.*)-.*") > 1.5
