@@ -332,20 +332,17 @@ processed, _ := processor.ProcessMacros(query, ctx)
 package main
 
 import (
-    "transpiler/pkg/lexer"
-    "transpiler/pkg/parser"
     "transpiler/pkg/transpiler"
-    "transpiler/pkg/builder"
-    "transpiler/pkg/factory"
+    "transpiler/pkg/clickhouse"
 )
 
 func main() {
-    // Create components using factory
-    factory := factory.NewClickHouseComponentFactory()
-    builder := factory.CreateSQLBuilder()
-    
-    // Create transpiler
-    t := transpiler.New(builder, factory)
+    // Create transpiler with API parser
+    config := &transpiler.Config{
+        Schema:        clickhouse.DefaultSchema(),
+        PrometheusURL: "http://localhost:9090",
+    }
+    t := transpiler.New(config)
     
     // Transpile PromQL
     promQL := "rate(http_requests_total{job='api'}[5m])"
@@ -357,6 +354,8 @@ func main() {
     fmt.Println(sql)
 }
 ```
+
+**Note:** This transpiler uses Prometheus `/api/v1/parse_query` API for parsing. No custom lexer/parser is used.
 
 ### CLI Usage
 
@@ -461,8 +460,9 @@ config := Config{
 go test ./...
 
 # Run specific package tests
-go test ./pkg/lexer
-go test ./pkg/parser
+go test ./pkg/transpiler
+go test ./pkg/promapi
+go test ./pkg/clickhouse
 go test ./pkg/transpiler
 
 # Run with coverage

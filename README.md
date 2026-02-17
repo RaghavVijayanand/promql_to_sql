@@ -18,9 +18,7 @@ A high-performance transpiler that converts Prometheus Query Language (PromQL) q
 transpiler/
 ├── cmd/promql-transpiler/    # CLI application
 ├── pkg/
-│   ├── lexer/               # Tokenizes PromQL expressions
-│   ├── parser/              # Parses tokens into AST
-│   ├── ast/                 # Abstract Syntax Tree definitions
+│   ├── promapi/             # Prometheus API client for parsing
 │   ├── transpiler/          # Core transpilation logic
 │   └── clickhouse/          # ClickHouse schema and query builder
 ├── internal/

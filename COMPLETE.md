@@ -72,19 +72,14 @@ transpiler/
 
 ## 🎯 Key Components
 
-### 1. Lexer (pkg/lexer/)
-- Tokenizes PromQL expressions
-- Supports all PromQL tokens, operators, keywords
-- Handles numbers, strings, durations, identifiers
-- Line and column tracking for error messages
+### 1. API Parser (pkg/promapi/)
+- Uses Prometheus `/api/v1/parse_query` endpoint
+- HTTP client for Prometheus API
+- Converts Prometheus JSON AST to internal AST
+- 100% compatible with Prometheus PromQL syntax
+- Supports all PromQL constructs automatically
 
-### 2. Parser (pkg/parser/)
-- Recursive descent parser
-- Generates complete AST
-- Supports all PromQL constructs
-- Comprehensive error handling
-
-### 3. AST (pkg/ast/)
+### 2. AST (pkg/ast/)
 - Complete node definitions
 - Vector and matrix selectors
 - Aggregation expressions
@@ -92,7 +87,7 @@ transpiler/
 - Binary and unary expressions
 - Label matchers and grouping
 
-### 4. Transpiler (pkg/transpiler/)
+### 3. Transpiler (pkg/transpiler/)
 - Converts AST to ClickHouse SQL
 - Handles time-series functions (rate, increase, delta)
 - Supports aggregations with grouping

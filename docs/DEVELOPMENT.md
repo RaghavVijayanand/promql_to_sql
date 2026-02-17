@@ -77,10 +77,9 @@ transpiler/
 ├── cmd/                    # Command-line applications
 │   └── promql-transpiler/  # Main CLI tool
 ├── pkg/                    # Public packages (importable by others)
-│   ├── ast/               # Abstract Syntax Tree definitions
+│   ├── ast/               # Abstract Syntax Tree definitions (legacy)
 │   ├── clickhouse/        # ClickHouse schema and query builder
-│   ├── lexer/             # Lexical analyzer (tokenizer)
-│   ├── parser/            # Parser (tokens to AST)
+│   ├── promapi/           # Prometheus API client for parsing
 │   └── transpiler/        # Core transpilation logic
 ├── internal/              # Private packages (not importable)
 │   └── cardinality/       # Cardinality estimation and optimization
@@ -91,49 +90,33 @@ transpiler/
 
 ## Adding New Features
 
+### Important: Parser Architecture
+
+This transpiler uses **Prometheus API** for parsing (via `/api/v1/parse_query`). The parser returns JSON AST that we transpile directly to SQL.
+
+**Parsing is handled by:**
+- `pkg/promapi/client.go` - HTTP client to Prometheus
+- `pkg/promapi/parser.go` - Parser interface
+- `pkg/transpiler/transpiler_jsonast.go` - Direct JSON AST transpilation
+
 ### Adding a New PromQL Function
 
-1. **Add token to lexer** (`pkg/lexer/lexer.go`):
-   ```go
-   const (
-       // ... existing tokens
-       MY_FUNC // my_func
-   )
-   
-   var keywords = map[string]TokenType{
-       // ... existing keywords
-       "my_func": MY_FUNC,
-   }
-   ```
+Since parsing is handled by Prometheus, you only need to:
 
-2. **Add function type to AST** (`pkg/ast/ast.go`):
+1. **Add function type to AST** (`pkg/ast/ast.go`):
    ```go
    const (
        // ... existing functions
        FuncMyFunc FuncType = "my_func"
    )
-   ```
-
-3. **Update parser** (`pkg/parser/parser.go`):
-   ```go
-   func (p *Parser) isFunctionCall() bool {
-       funcTokens := []lexer.TokenType{
-           // ... existing functions
-           lexer.MY_FUNC,
-       }
-       // ...
-   }
    
-   func tokenToFuncType(t lexer.TokenType) ast.FuncType {
-       switch t {
-       // ... existing cases
-       case lexer.MY_FUNC:
-           return ast.FuncMyFunc
-       }
+   var KnownFunctions = map[string]FuncType{
+       // ... existing
+       "my_func": FuncMyFunc,
    }
    ```
 
-4. **Implement transpilation** (`pkg/transpiler/transpiler.go`):
+2. **Implement transpilation** (`pkg/transpiler/transpiler.go`):
    ```go
    func (t *Transpiler) transpileCall(call *ast.Call) (string, error) {
        switch call.Func {
@@ -148,14 +131,15 @@ transpiler/
    }
    ```
 
-5. **Add tests**:
-   - Add lexer test in `pkg/lexer/lexer_test.go`
-   - Add parser test in `pkg/parser/parser_test.go`
+3. **Add tests**:
    - Add transpiler test in `pkg/transpiler/transpiler_test.go`
+   - Prometheus will handle parsing automatically
+
+**Note:** If Prometheus doesn't recognize your function, the API will return an error. Only implement functions that Prometheus already supports.
 
 ### Adding a New Aggregation Operator
 
-Similar process to functions, but work with `AggOp` instead of `FuncType`.
+Similar process to functions, but work with the aggregation node type in the JSON transpiler.
 
 ### Adding Custom ClickHouse Optimizations
 
@@ -290,9 +274,10 @@ go tool pprof cpu.prof
 ### Parser Errors
 
 If the parser fails:
-1. Check the lexer tokens: `lexer.Tokenize(input)`
-2. Verify token types match expected patterns
-3. Add parser debugging prints
+1. Check Prometheus is running at `http://localhost:9090`
+2. Test the query directly in Prometheus UI
+3. Verify the API response: `curl -X POST http://localhost:9090/api/v1/parse_query -d 'query=up'`
+4. Add debugging prints in `pkg/promapi/parser.go`
 
 ### Incorrect SQL Generation
 

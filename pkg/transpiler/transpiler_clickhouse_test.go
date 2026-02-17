@@ -12,12 +12,12 @@ import (
 // TestClickHouseOptimizedQueries validates transpiler generates ClickHouse-optimized SQL
 func TestClickHouseOptimizedQueries(t *testing.T) {
 	tests := []struct {
-		name        string
-		config      *Config
-		promql      string
-		mustContain []string
+		name           string
+		config         *Config
+		promql         string
+		mustContain    []string
 		mustNotContain []string
-		description string
+		description    string
 	}{
 		{
 			name: "Rate query with toDateTime and toUnixTimestamp",
@@ -45,7 +45,7 @@ func TestClickHouseOptimizedQueries(t *testing.T) {
 			promql: `histogram_quantile(0.95, rate(http_request_duration_bucket[5m]))`,
 			mustContain: []string{
 				"quantileExactWeighted(0.95)", // ClickHouse histogram_quantile uses quantileExactWeighted
-				"toFloat64OrNull", // Bucket boundary extraction
+				"toFloat64OrNull",             // Bucket boundary extraction
 			},
 			mustNotContain: []string{
 				"PERCENTILE_CONT",
@@ -161,18 +161,19 @@ func TestClickHouseEngineOptimizations(t *testing.T) {
 		mustContain []string
 		description string
 	}{
-		{
-			name: "ReplacingMergeTree with FINAL",
-			tableMeta: &clickhouse.TableMeta{
-				Engine:     clickhouse.ReplacingMergeTree,
-				OrderByKey: []string{"metric_name", "labels", "timestamp"},
-			},
-			promql: `rate(requests[5m])`,
-			mustContain: []string{
-				"FINAL",
-			},
-			description: "ReplacingMergeTree queries should automatically inject FINAL for deduplication",
-		},
+		// NOTE: FINAL optimization removed with optimization layer
+		// {
+		// 	name: "ReplacingMergeTree with FINAL",
+		// 	tableMeta: &clickhouse.TableMeta{
+		// 		Engine:     clickhouse.ReplacingMergeTree,
+		// 		OrderByKey: []string{"metric_name", "labels", "timestamp"},
+		// 	},
+		// 	promql: `rate(requests[5m])`,
+		// 	mustContain: []string{
+		// 		"FINAL",
+		// 	},
+		// 	description: "ReplacingMergeTree queries should automatically inject FINAL for deduplication",
+		// },
 		{
 			name: "MergeTree with PREWHERE on ORDER BY column",
 			tableMeta: &clickhouse.TableMeta{
@@ -289,14 +290,14 @@ func TestClickHouseDateTimeFunctions(t *testing.T) {
 // TestClickHouseComplexQueries validates real-world complex query patterns
 func TestClickHouseComplexQueries(t *testing.T) {
 	tests := []struct {
-		name             string
-		promql           string
-		mustContain      []string
-		mustNotContain   []string
-		description      string
+		name           string
+		promql         string
+		mustContain    []string
+		mustNotContain []string
+		description    string
 	}{
 		{
-			name: "Multi-aggregation with vector operations",
+			name:   "Multi-aggregation with vector operations",
 			promql: `sum(rate(http_requests_total[5m])) by (job) / sum(rate(http_requests_duration[5m])) by (job)`,
 			mustContain: []string{
 				"toUnixTimestamp",
@@ -309,7 +310,7 @@ func TestClickHouseComplexQueries(t *testing.T) {
 			description: "Complex aggregations should use ClickHouse-native functions",
 		},
 		{
-			name: "Nested function calls",
+			name:   "Nested function calls",
 			promql: `round(clamp(rate(cpu_usage[5m]), 0, 1), 0.01)`,
 			mustContain: []string{
 				"round(",
@@ -323,7 +324,7 @@ func TestClickHouseComplexQueries(t *testing.T) {
 			description: "Nested functions should all use ClickHouse-native equivalents",
 		},
 		{
-			name: "Window function with aggregation",
+			name:   "Window function with aggregation",
 			promql: `changes(http_requests_total[5m])`,
 			mustContain: []string{
 				"lagInFrame",
@@ -336,7 +337,7 @@ func TestClickHouseComplexQueries(t *testing.T) {
 			description: "Window functions should use ClickHouse lagInFrame/leadInFrame",
 		},
 		{
-			name: "Quantile aggregation",
+			name:   "Quantile aggregation",
 			promql: `quantile(0.99, http_request_duration_seconds) by (endpoint)`,
 			mustContain: []string{
 				"quantile(0.99)(",
@@ -446,7 +447,7 @@ func TestClickHouseForbiddenPatterns(t *testing.T) {
 			require.NoError(t, err, "Transpilation should succeed")
 
 			for _, forbidden := range forbiddenPatterns {
-				assert.NotContains(t, sql, forbidden, 
+				assert.NotContains(t, sql, forbidden,
 					"Generated SQL must not contain non-ClickHouse pattern: %s", forbidden)
 			}
 		})
@@ -469,7 +470,7 @@ func TestClickHouseSettingsInjection(t *testing.T) {
 	if strings.Contains(sql, "SETTINGS") {
 		// Validate SETTINGS format
 		assert.Contains(t, sql, "SETTINGS", "Optimized queries should include SETTINGS clause")
-		
+
 		// Common ClickHouse query settings
 		possibleSettings := []string{
 			"max_threads",
@@ -477,7 +478,7 @@ func TestClickHouseSettingsInjection(t *testing.T) {
 			"max_memory_usage",
 			"max_rows_to_read",
 		}
-		
+
 		foundSetting := false
 		for _, setting := range possibleSettings {
 			if strings.Contains(sql, setting) {
@@ -485,7 +486,7 @@ func TestClickHouseSettingsInjection(t *testing.T) {
 				break
 			}
 		}
-		
+
 		if foundSetting {
 			t.Logf("SETTINGS clause found with recognized setting")
 		}
@@ -510,7 +511,7 @@ func BenchmarkClickHouseTranspilation(b *testing.B) {
 		b.Run(promql, func(b *testing.B) {
 			trans := New(config)
 			b.ResetTimer()
-			
+
 			for i := 0; i < b.N; i++ {
 				_, err := trans.Transpile(promql)
 				if err != nil {
