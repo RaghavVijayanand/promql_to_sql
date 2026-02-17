@@ -1,0 +1,47 @@
+{
+  "status": "success",
+  "data": {
+    "http_response_size_bytes": [
+      {
+        "type": "histogram",
+        "unit": "",
+        "help": "HTTP response size distribution"
+      }
+    ],
+    "http_server_request_count_total": [
+      {
+        "type": "counter",
+        "unit": "",
+        "help": "Total HTTP server requests"
+      }
+    ],
+    "http_server_request_duration_seconds": [
+      {
+        "type": "histogram",
+        "unit": "",
+        "help": "HTTP server request duration"
+      }
+    ],
+    "network_io_bytes_total": [
+      {
+        "type": "counter",
+        "unit": "",
+        "help": "Total network bytes transmitted"
+      }
+    ],
+    "system_cpu_utilization_ratio": [
+      {
+        "type": "gauge",
+        "unit": "",
+        "help": "CPU utilization"
+      }
+    ],
+    "system_memory_usage_bytes": [
+      {
+        "type": "gauge",
+        "unit": "",
+        "help": "Memory usage in bytes"
+      }
+    ]
+  }
+}

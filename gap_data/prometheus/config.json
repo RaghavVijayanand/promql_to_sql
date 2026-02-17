@@ -1,0 +1,6 @@
+{
+  "status": "success",
+  "data": {
+    "yaml": "global:\n  scrape_interval: 5s\n  scrape_timeout: 5s\n  evaluation_interval: 1m\n  metric_name_validation_scheme: utf8\n  scrape_native_histograms: false\nruntime:\n  gogc: 75\nalerting:\n  alertmanagers:\n  - follow_redirects: true\n    enable_http2: true\n    scheme: http\n    timeout: 10s\n    api_version: v2\n    static_configs:\n    - targets:\n      - alertmanager:9093\nrule_files:\n- /etc/prometheus/alert-rules.yml\nscrape_configs:\n- job_name: otel-collector\n  honor_timestamps: true\n  track_timestamps_staleness: false\n  scrape_interval: 5s\n  scrape_timeout: 5s\n  scrape_protocols:\n  - OpenMetricsText1.0.0\n  - OpenMetricsText0.0.1\n  - PrometheusText1.0.0\n  - PrometheusText0.0.4\n  scrape_native_histograms: false\n  always_scrape_classic_histograms: false\n  convert_classic_histograms_to_nhcb: false\n  metrics_path: /metrics\n  scheme: http\n  enable_compression: true\n  metric_name_validation_scheme: utf8\n  metric_name_escaping_scheme: allow-utf-8\n  follow_redirects: true\n  enable_http2: true\n  static_configs:\n  - targets:\n    - otel-collector:8889\notlp:\n  translation_strategy: UnderscoreEscapingWithSuffixes\n  label_name_underscore_sanitization: true\n  label_name_preserve_multiple_underscores: true\n"
+  }
+}

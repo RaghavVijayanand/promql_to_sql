@@ -1,0 +1,74 @@
+{
+  "status": "success",
+  "data": {
+    "groups": [
+      {
+        "name": "python-otel-app-alerts",
+        "file": "/etc/prometheus/alert-rules.yml",
+        "rules": [
+          {
+            "state": "inactive",
+            "name": "HighErrorRate",
+            "query": "(sum(rate(http_server_request_count_total{http_response_status_code=~\"4..|5..\"}[5m])) / sum(rate(http_server_request_count_total[5m]))) * 100 > 20",
+            "duration": 60,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "critical"
+            },
+            "annotations": {
+              "description": "More than 20% of requests are failing.",
+              "summary": "High error rate detected"
+            },
+            "alerts": [],
+            "health": "ok",
+            "evaluationTime": 0.000821923,
+            "lastEvaluation": "2026-02-17T07:11:45.968097097Z",
+            "type": "alerting"
+          },
+          {
+            "state": "inactive",
+            "name": "HighCPUUsage",
+            "query": "system_cpu_utilization_ratio > 0.8",
+            "duration": 60,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "CPU usage is above 80%.",
+              "summary": "High CPU usage"
+            },
+            "alerts": [],
+            "health": "ok",
+            "evaluationTime": 0.000118226,
+            "lastEvaluation": "2026-02-17T07:11:45.968949794Z",
+            "type": "alerting"
+          },
+          {
+            "state": "inactive",
+            "name": "LowTraffic",
+            "query": "sum(rate(http_server_request_count_total[5m])) < 0.2",
+            "duration": 120,
+            "keepFiringFor": 0,
+            "labels": {
+              "severity": "critical"
+            },
+            "annotations": {
+              "description": "Request rate is unusually low.",
+              "summary": "Traffic dropped"
+            },
+            "alerts": [],
+            "health": "ok",
+            "evaluationTime": 5.5962e-05,
+            "lastEvaluation": "2026-02-17T07:11:45.969074054Z",
+            "type": "alerting"
+          }
+        ],
+        "interval": 60,
+        "limit": 0,
+        "evaluationTime": 0.001080604,
+        "lastEvaluation": "2026-02-17T07:11:45.968052084Z"
+      }
+    ]
+  }
+}

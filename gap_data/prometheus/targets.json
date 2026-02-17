@@ -1,0 +1,34 @@
+{
+  "status": "success",
+  "data": {
+    "activeTargets": [
+      {
+        "discoveredLabels": {
+          "__address__": "otel-collector:8889",
+          "__metrics_path__": "/metrics",
+          "__scheme__": "http",
+          "__scrape_interval__": "5s",
+          "__scrape_timeout__": "5s",
+          "job": "otel-collector"
+        },
+        "labels": {
+          "instance": "otel-collector:8889",
+          "job": "otel-collector"
+        },
+        "scrapePool": "otel-collector",
+        "scrapeUrl": "http://otel-collector:8889/metrics",
+        "globalUrl": "http://otel-collector:8889/metrics",
+        "lastError": "",
+        "lastScrape": "2026-02-17T07:12:02.294883453Z",
+        "lastScrapeDuration": 0.002400177,
+        "health": "up",
+        "scrapeInterval": "5s",
+        "scrapeTimeout": "5s"
+      }
+    ],
+    "droppedTargets": [],
+    "droppedTargetCounts": {
+      "otel-collector": 0
+    }
+  }
+}

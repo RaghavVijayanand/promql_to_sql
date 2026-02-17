@@ -1,0 +1,54 @@
+global:
+  resolve_timeout: 5m
+  http_config:
+    follow_redirects: true
+    enable_http2: true
+  smtp_from: documentation.suha@gmail.com
+  smtp_hello: localhost
+  smtp_smarthost: smtp.gmail.com:587
+  smtp_auth_username: documentation.suha@gmail.com
+  smtp_auth_password: <secret>
+  smtp_require_tls: true
+  smtp_tls_config:
+    insecure_skip_verify: false
+  slack_app_url: https://slack.com/api/chat.postMessage
+  pagerduty_url: https://events.pagerduty.com/v2/enqueue
+  opsgenie_api_url: https://api.opsgenie.com/
+  wechat_api_url: https://qyapi.weixin.qq.com/cgi-bin/
+  victorops_api_url: https://alert.victorops.com/integrations/generic/20131114/alert/
+  telegram_api_url: https://api.telegram.org
+  webex_api_url: https://webexapis.com/v1/messages
+  rocketchat_api_url: https://open.rocket.chat/
+route:
+  receiver: "null"
+  group_by:
+  - alertname
+  continue: false
+  routes:
+  - receiver: email-critical
+    match:
+      severity: critical
+    continue: false
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 1h
+receivers:
+- name: "null"
+- name: email-critical
+  email_configs:
+  - send_resolved: true
+    to: suhanazrin.s3@gmail.com
+    from: documentation.suha@gmail.com
+    hello: localhost
+    smarthost: smtp.gmail.com:587
+    auth_username: documentation.suha@gmail.com
+    auth_password: <secret>
+    headers:
+      From: documentation.suha@gmail.com
+      Subject: '{{ template "email.default.subject" . }}'
+      To: suhanazrin.s3@gmail.com
+    html: '{{ template "email.default.html" . }}'
+    require_tls: true
+    tls_config:
+      insecure_skip_verify: false
+templates: []

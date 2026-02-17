@@ -1,0 +1,180 @@
+{
+  "status": "success",
+  "data": {
+    "headStats": {
+      "numSeries": 73,
+      "numLabelPairs": 57,
+      "chunkCount": 171,
+      "minTime": 1771308000878,
+      "maxTime": 1771312322294
+    },
+    "seriesCountByMetricName": [
+      {
+        "name": "http_server_request_count_total",
+        "value": 24
+      },
+      {
+        "name": "http_response_size_bytes_bucket",
+        "value": 16
+      },
+      {
+        "name": "http_server_request_duration_seconds_bucket",
+        "value": 16
+      },
+      {
+        "name": "ALERTS",
+        "value": 3
+      },
+      {
+        "name": "ALERTS_FOR_STATE",
+        "value": 2
+      },
+      {
+        "name": "up",
+        "value": 1
+      },
+      {
+        "name": "http_server_request_duration_seconds_sum",
+        "value": 1
+      },
+      {
+        "name": "system_cpu_utilization_ratio",
+        "value": 1
+      },
+      {
+        "name": "scrape_duration_seconds",
+        "value": 1
+      },
+      {
+        "name": "scrape_samples_post_metric_relabeling",
+        "value": 1
+      }
+    ],
+    "labelValueCountByLabelName": [
+      {
+        "name": "__name__",
+        "value": 17
+      },
+      {
+        "name": "le",
+        "value": 16
+      },
+      {
+        "name": "http_response_status_code",
+        "value": 4
+      },
+      {
+        "name": "http_request_method",
+        "value": 3
+      },
+      {
+        "name": "http_route",
+        "value": 2
+      },
+      {
+        "name": "alertname",
+        "value": 2
+      },
+      {
+        "name": "alertstate",
+        "value": 2
+      },
+      {
+        "name": "severity",
+        "value": 1
+      },
+      {
+        "name": "network_transport",
+        "value": 1
+      },
+      {
+        "name": "exported_job",
+        "value": 1
+      }
+    ],
+    "memoryInBytesByLabelName": [
+      {
+        "name": "__name__",
+        "value": 3026
+      },
+      {
+        "name": "instance",
+        "value": 1972
+      },
+      {
+        "name": "exported_job",
+        "value": 1827
+      },
+      {
+        "name": "otel_scope_name",
+        "value": 1575
+      },
+      {
+        "name": "job",
+        "value": 1292
+      },
+      {
+        "name": "http_request_method",
+        "value": 1016
+      },
+      {
+        "name": "http_route",
+        "value": 936
+      },
+      {
+        "name": "http_response_status_code",
+        "value": 720
+      },
+      {
+        "name": "content_type",
+        "value": 540
+      },
+      {
+        "name": "le",
+        "value": 282
+      }
+    ],
+    "seriesCountByLabelValuePair": [
+      {
+        "name": "job=otel-collector",
+        "value": 68
+      },
+      {
+        "name": "instance=otel-collector:8889",
+        "value": 68
+      },
+      {
+        "name": "otel_scope_name=__main__",
+        "value": 63
+      },
+      {
+        "name": "exported_job=python-otel-app",
+        "value": 63
+      },
+      {
+        "name": "http_route=/api/users",
+        "value": 30
+      },
+      {
+        "name": "http_request_method=GET",
+        "value": 26
+      },
+      {
+        "name": "__name__=http_server_request_count_total",
+        "value": 24
+      },
+      {
+        "name": "content_type=application/json",
+        "value": 18
+      },
+      {
+        "name": "__name__=http_server_request_duration_seconds_bucket",
+        "value": 16
+      },
+      {
+        "name": "__name__=http_response_size_bytes_bucket",
+        "value": 16
+      }
+    ]
+  }
+}

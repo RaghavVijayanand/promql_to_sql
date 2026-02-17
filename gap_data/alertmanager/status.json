@@ -1,0 +1,24 @@
+{
+  "cluster": {
+    "name": "01KHN2HHBV7HGTAQF1R1FBT6M3",
+    "peers": [
+      {
+        "address": "172.18.0.4:9094",
+        "name": "01KHN2HHBV7HGTAQF1R1FBT6M3"
+      }
+    ],
+    "status": "ready"
+  },
+  "config": {
+    "original": "global:\n  resolve_timeout: 5m\n  http_config:\n    follow_redirects: true\n    enable_http2: true\n  smtp_from: documentation.suha@gmail.com\n  smtp_hello: localhost\n  smtp_smarthost: smtp.gmail.com:587\n  smtp_auth_username: documentation.suha@gmail.com\n  smtp_auth_password: <secret>\n  smtp_require_tls: true\n  smtp_tls_config:\n    insecure_skip_verify: false\n  slack_app_url: https://slack.com/api/chat.postMessage\n  pagerduty_url: https://events.pagerduty.com/v2/enqueue\n  opsgenie_api_url: https://api.opsgenie.com/\n  wechat_api_url: https://qyapi.weixin.qq.com/cgi-bin/\n  victorops_api_url: https://alert.victorops.com/integrations/generic/20131114/alert/\n  telegram_api_url: https://api.telegram.org\n  webex_api_url: https://webexapis.com/v1/messages\n  rocketchat_api_url: https://open.rocket.chat/\nroute:\n  receiver: \"null\"\n  group_by:\n  - alertname\n  continue: false\n  routes:\n  - receiver: email-critical\n    match:\n      severity: critical\n    continue: false\n  group_wait: 10s\n  group_interval: 30s\n  repeat_interval: 1h\nreceivers:\n- name: \"null\"\n- name: email-critical\n  email_configs:\n  - send_resolved: true\n    to: suhanazrin.s3@gmail.com\n    from: documentation.suha@gmail.com\n    hello: localhost\n    smarthost: smtp.gmail.com:587\n    auth_username: documentation.suha@gmail.com\n    auth_password: <secret>\n    headers:\n      From: documentation.suha@gmail.com\n      Subject: '{{ template \"email.default.subject\" . }}'\n      To: suhanazrin.s3@gmail.com\n    html: '{{ template \"email.default.html\" . }}'\n    require_tls: true\n    tls_config:\n      insecure_skip_verify: false\ntemplates: []\n"
+  },
+  "uptime": "2026-02-17T05:53:02.853Z",
+  "versionInfo": {
+    "branch": "HEAD",
+    "buildDate": "20260202-13:00:37",
+    "buildUser": "root@47d5a7c91e78",
+    "goVersion": "go1.25.6",
+    "revision": "0ae07a09fbb26a7738c867306f32b5f42583a7d2",
+    "version": "0.31.0"
+  }
+}
