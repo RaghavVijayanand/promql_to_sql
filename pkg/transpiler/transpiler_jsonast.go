@@ -1113,7 +1113,30 @@ func (t *Transpiler) transpileBinaryExprNode(node *promapi.ASTNode) (string, err
 	sql.WriteString("\n)\n")
 	sql.WriteString("SELECT\n")
 	sql.WriteString("  l.timestamp,\n")
-	sql.WriteString("  l.labels,\n")
+
+	// Handle label selection based on group_left/group_right
+	if node.Matching != nil && len(node.Matching.Include) > 0 {
+		// group_left or group_right - merge labels from the "many" side
+		// The Include field contains labels to include from the "many" side
+		// Card field indicates which side is "many": "many-to-one" means left is many
+		if node.Matching.Card == "many-to-one" {
+			// group_left - include labels from left side (many)
+			var includeLabels []string
+			for _, label := range node.Matching.Include {
+				includeLabels = append(includeLabels, fmt.Sprintf("'%s', l.labels['%s']", label, label))
+			}
+			sql.WriteString(fmt.Sprintf("  mapUpdate(l.labels, map(%s)) AS labels,\n", strings.Join(includeLabels, ", ")))
+		} else {
+			// group_right - include labels from right side (many)
+			var includeLabels []string
+			for _, label := range node.Matching.Include {
+				includeLabels = append(includeLabels, fmt.Sprintf("'%s', r.labels['%s']", label, label))
+			}
+			sql.WriteString(fmt.Sprintf("  mapUpdate(l.labels, map(%s)) AS labels,\n", strings.Join(includeLabels, ", ")))
+		}
+	} else {
+		sql.WriteString("  l.labels,\n")
+	}
 
 	switch op {
 	case "+":
@@ -1150,7 +1173,7 @@ func (t *Transpiler) transpileBinaryExprNode(node *promapi.ASTNode) (string, err
 		return "", fmt.Errorf("unsupported binary operator for vectors: %s", op)
 	}
 
-	// For logical operators, use LEFT JOIN; for others use INNER JOIN
+	// Determine JOIN type based on operator
 	sql.WriteString("FROM left_query AS l\n")
 	if op == "or" || op == "unless" {
 		sql.WriteString("LEFT JOIN right_query AS r\n")
@@ -1159,7 +1182,36 @@ func (t *Transpiler) transpileBinaryExprNode(node *promapi.ASTNode) (string, err
 	} else {
 		sql.WriteString("INNER JOIN right_query AS r\n")
 	}
-	sql.WriteString("ON l.timestamp = r.timestamp AND l.labels = r.labels")
+
+	// Build JOIN condition based on vector matching rules
+	sql.WriteString("ON l.timestamp = r.timestamp")
+
+	if node.Matching != nil && len(node.Matching.Labels) > 0 {
+		// Custom label matching with on() or ignoring()
+		if node.Matching.On {
+			// on(label1, label2, ...) - join only on specified labels
+			for _, label := range node.Matching.Labels {
+				sql.WriteString(fmt.Sprintf(" AND l.labels['%s'] = r.labels['%s']", label, label))
+			}
+		} else {
+			// ignoring(label1, label2, ...) - join on all labels except specified
+			// We need to compare label maps excluding the ignored keys
+			// Use mapFilter to remove ignored labels, then compare
+			var ignoredLabels []string
+			for _, label := range node.Matching.Labels {
+				ignoredLabels = append(ignoredLabels, fmt.Sprintf("'%s'", label))
+			}
+
+			// Create filtered label maps and compare them
+			// mapFilter(map, keys_to_remove) removes specified keys from map
+			ignoredList := strings.Join(ignoredLabels, ", ")
+			sql.WriteString(fmt.Sprintf(" AND mapFilter((k, v) -> k NOT IN (%s), l.labels) = mapFilter((k, v) -> k NOT IN (%s), r.labels)",
+				ignoredList, ignoredList))
+		}
+	} else {
+		// Default: match on all labels
+		sql.WriteString(" AND l.labels = r.labels")
+	}
 
 	return sql.String(), nil
 }
